@@ -2,11 +2,20 @@ import { useContext } from "react";
 import { CurrentUser } from "../contexts/CurrentUser";
 
 function CommentCard({ comment, onDelete }) {
+    
     const { currentUser } = useContext(CurrentUser)
 
     let deleteButton = null;
 
     if (currentUser?.userId === comment.authorId) {
+        deleteButton = (
+            <button className="btn btn-danger" onClick={onDelete} >
+                Delete Comment
+            </button>
+        )
+    }
+    //An admin should be able to delete other user's comments if they're an obvious review bomb troll
+    if (currentUser?.role === 'admin') {
         deleteButton = (
             <button className="btn btn-danger" onClick={onDelete} >
                 Delete Comment

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useHistory, useParams } from "react-router"
+import { CurrentUser } from "../contexts/CurrentUser";
 import CommentCard from './CommentCard'
 import NewCommentForm from "./NewCommentForm";
 
@@ -8,6 +9,8 @@ function PlaceDetails() {
 	const { placeId } = useParams()
 
 	const history = useHistory()
+	const { currentUser } = useContext(CurrentUser)
+
 
 	const [place, setPlace] = useState(null)
 
@@ -48,12 +51,6 @@ function PlaceDetails() {
 			},
 			body: JSON.stringify(deletedComment)
 		})
-	
-	  
-	
-
-  
-
 
 		setPlace({
 			...place,
@@ -83,9 +80,6 @@ function PlaceDetails() {
 		})
 
 	}
-
-
-
 	let comments = (
 		<h3 className="inactive">
 			No comments yet!
@@ -110,13 +104,33 @@ function PlaceDetails() {
 				{stars} stars
 			</h3>
 		)
-		comments = place.comments.map(comment => {
+		  
+	comments = place.comments.map(comment => {
 			return (
-				<CommentCard key={comment.commentId} comment={comment} onDelete={() => deleteComment(comment)} />
+				<CommentCard 
+					key={comment.commentId} 
+					comment={comment} 
+					onDelete={() => deleteComment(comment)} 
+				/>
 			)
 		})
 	}
-
+	
+	let placeActions = null
+	
+	if (currentUser?.role === 'admin') {
+		placeActions = (
+			<>
+				<a className="btn btn-warning" onClick={editPlace}>
+					Edit
+				</a>
+				<button type="submit" className="btn btn-danger" onClick={deletePlace}>
+					Delete
+				</button>
+			</>
+		)
+	}
+	
 
 	return (
 		<main>
@@ -144,12 +158,7 @@ function PlaceDetails() {
 						Serving {place.cuisines}.
 					</h4>
 					<br />
-					<a className="btn btn-warning" onClick={editPlace}>
-						Edit
-					</a>{` `}
-					<button type="submit" className="btn btn-danger" onClick={deletePlace}>
-						Delete
-					</button>
+					{placeActions}
 				</div>
 			</div>
 			<hr />
